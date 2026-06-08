@@ -1,2 +1,11 @@
-"""GASPROFILER — Per-opcode and per-function gas profiler that flags unbounded loops, DoS-prone patterns, and regressions against a committed baseline."""
-__version__ = "0.1.0"
+"""gasprofiler — part of the Cognis Neural Suite."""
+try:  # re-export the tool's public API + identity from core
+    from gasprofiler.core import *  # noqa: F401,F403
+except Exception:  # pragma: no cover
+    pass
+try:
+    from gasprofiler.core import TOOL_NAME, TOOL_VERSION
+except Exception:  # pragma: no cover
+    TOOL_NAME = "gasprofiler"
+    TOOL_VERSION = "0.1.0"
+__version__ = TOOL_VERSION
