@@ -4,11 +4,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-import pytest
 
 from gasprofiler import TOOL_NAME, TOOL_VERSION
 from gasprofiler.core import (
-    build_snapshot,
     compare_snapshots,
     profile_path,
     profile_source,

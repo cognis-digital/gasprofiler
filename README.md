@@ -16,7 +16,7 @@
 </div>
 
 ```bash
-pip install cognis-gasprofiler
+pip install "git+https://github.com/cognis-digital/gasprofiler.git"
 gasprofiler scan .            # → prioritized findings in seconds
 ```
 
@@ -51,7 +51,7 @@ Gas-griefing DoS as a security class plus a CI baseline that fails PRs on regres
 ## Quick start
 
 ```bash
-pip install cognis-gasprofiler
+pip install "git+https://github.com/cognis-digital/gasprofiler.git"
 gasprofiler --version
 gasprofiler scan .                       # scan current project
 gasprofiler scan . --format json         # machine-readable
