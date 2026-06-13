@@ -123,12 +123,12 @@ def test_snapshot_roundtrip():
 
 def test_cli_profile_exit_code_on_findings():
     # Demo has unbounded loops -> exit 1
-    rc = main(["profile", str(DEMO), "--format", "json"])
+    rc = main(["--format", "json", "profile", str(DEMO)])
     assert rc == 1
 
 
 def test_cli_profile_no_fail_flag():
-    rc = main(["profile", str(DEMO), "--no-fail", "--format", "json"])
+    rc = main(["--format", "json", "profile", str(DEMO), "--no-fail"])
     assert rc == 0
 
 

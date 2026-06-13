@@ -20,6 +20,12 @@ pip install "git+https://github.com/cognis-digital/gasprofiler.git"
 gasprofiler scan .            # → prioritized findings in seconds
 ```
 
+<!-- cognis:layman:start -->
+## What is this?
+
+Solidity smart contracts on Ethereum charge users "gas fees" for every operation they run — poorly written contracts can cost users far more than necessary, or even let attackers deliberately make functions impossibly expensive to call. Gasprofiler scans your Solidity contract files and tells you exactly how much gas each function is estimated to use, highlights any dangerous patterns like unbounded loops that could be exploited or drain wallets, and can fail your CI pipeline automatically if a code change causes gas costs to increase. It is aimed at Solidity developers and smart-contract security teams who want to catch gas-related bugs before they reach production.
+<!-- cognis:layman:end -->
+
 ## Contents
 
 - [Why gasprofiler?](#why) · [Features](#features) · [Quick start](#quick-start) · [Example](#example) · [Architecture](#architecture) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)
@@ -48,6 +54,42 @@ Gas-griefing DoS as a security class plus a CI baseline that fails PRs on regres
 <div align="right"><a href="#top">↑ back to top</a></div>
 
 <a name="quick-start"></a>
+<!-- cognis:install:start -->
+## Install
+
+`gasprofiler` is source-available (not published to PyPI) — every method below installs
+straight from GitHub. Pick whichever you prefer; the one-line scripts auto-detect
+the best tool available on your machine.
+
+**One-liner (Linux / macOS):**
+```sh
+curl -fsSL https://raw.githubusercontent.com/cognis-digital/gasprofiler/HEAD/install.sh | sh
+```
+
+**One-liner (Windows PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/cognis-digital/gasprofiler/HEAD/install.ps1 | iex
+```
+
+**Or install manually — any one of:**
+```sh
+pipx install "git+https://github.com/cognis-digital/gasprofiler.git"     # isolated (recommended)
+uv tool install "git+https://github.com/cognis-digital/gasprofiler.git"  # uv
+pip install "git+https://github.com/cognis-digital/gasprofiler.git"      # pip
+```
+
+**From source:**
+```sh
+git clone https://github.com/cognis-digital/gasprofiler.git
+cd gasprofiler && pip install .
+```
+
+Then run:
+```sh
+gasprofiler --help
+```
+<!-- cognis:install:end -->
+
 ## Quick start
 
 ```bash
