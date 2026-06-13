@@ -20,6 +20,30 @@ pip install cognis-gasprofiler
 gasprofiler scan .            # → prioritized findings in seconds
 ```
 
+
+## Usage — step by step
+
+1. Install (Python 3.9+):
+   ```bash
+   pip install gasprofiler
+   ```
+2. Profile a Solidity contract and print a per-function gas table:
+   ```bash
+   gasprofiler profile contracts/Token.sol
+   ```
+3. Save a baseline snapshot for CI (globs are supported):
+   ```bash
+   gasprofiler profile "contracts/*.sol" --out .gas-baseline.json
+   ```
+4. Fail a PR when any function regresses beyond a tolerance vs the baseline:
+   ```bash
+   gasprofiler check "contracts/*.sol" --baseline .gas-baseline.json --tolerance 0.05
+   ```
+5. Read the output: the table sorts functions by estimated gas and flags
+   `UNBOUNDED` loops; `check` prints regressions/improvements. Use
+   `--format json | jq .` for tooling. Exit codes: `0` clean, `1`
+   unbounded-loop findings (profile) or regressions (check), `2` usage/IO error.
+
 ## Contents
 
 - [Why gasprofiler?](#why) · [Features](#features) · [Quick start](#quick-start) · [Example](#example) · [Architecture](#architecture) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)
