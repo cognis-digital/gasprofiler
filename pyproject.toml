@@ -34,3 +34,6 @@ gasprofiler = "gasprofiler.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["gasprofiler"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
