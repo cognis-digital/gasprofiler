@@ -32,3 +32,10 @@ gasprofiler = "gasprofiler.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["gasprofiler"]
+
+[tool.ruff]
+line-length = 130
+
+[tool.ruff.lint]
+select = ["F", "E"]
+ignore = ["E501"]

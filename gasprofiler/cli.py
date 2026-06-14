@@ -108,13 +108,26 @@ def _cmd_profile(args) -> int:
     if not files:
         print("error: no .sol files matched", file=sys.stderr)
         return 2
-    snap = build_snapshot(files)
+    try:
+        snap = build_snapshot(files)
+    except ValueError as e:
+        print(f"error: {e}", file=sys.stderr)
+        return 2
     d = snapshot_to_dict(snap)
 
     if args.out:
-        Path(args.out).write_text(json.dumps(d, indent=2), encoding="utf-8")
+        out_path = Path(args.out)
+        if out_path.parent != Path(".") and not out_path.parent.exists():
+            print(
+                f"error: output directory does not exist: {out_path.parent}",
+                file=sys.stderr,
+            )
+            return 2
+        out_path.write_text(json.dumps(d, indent=2), encoding="utf-8")
         if args.format != "json":
-            print(f"Wrote snapshot to {args.out} ({len(d['functions'])} functions).")
+            print(
+                f"Wrote snapshot to {args.out} ({len(d['functions'])} functions)."
+            )
 
     if args.format == "json":
         print(json.dumps(d, indent=2))
@@ -135,7 +148,17 @@ def _cmd_check(args) -> int:
     if not Path(args.baseline).exists():
         print(f"error: baseline not found: {args.baseline}", file=sys.stderr)
         return 2
-    baseline = load_snapshot(args.baseline)
+    if args.tolerance < 0.0:
+        print(
+            "error: --tolerance must be >= 0 (e.g. 0.05 for 5%)",
+            file=sys.stderr,
+        )
+        return 2
+    try:
+        baseline = load_snapshot(args.baseline)
+    except ValueError as e:
+        print(f"error: {e}", file=sys.stderr)
+        return 2
     current = build_snapshot(files)
     res = compare_snapshots(baseline, current, tolerance=args.tolerance)
     d = res.to_dict()
@@ -207,6 +230,9 @@ def main(argv=None) -> int:
     try:
         return args.func(args)
     except FileNotFoundError as e:
+        print(f"error: {e}", file=sys.stderr)
+        return 2
+    except ValueError as e:
         print(f"error: {e}", file=sys.stderr)
         return 2
     except OSError as e:

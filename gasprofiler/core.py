@@ -18,6 +18,9 @@ from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Iterable
 
+TOOL_NAME = "gasprofiler"
+TOOL_VERSION = "0.1.0"
+
 # ---------------------------------------------------------------------------
 # Gas cost model (EVM-derived approximate constants, post-Berlin-ish).
 # These are intentionally coarse — used for relative scoring, not billing.
@@ -300,9 +303,23 @@ def profile_source(src: str, source_name: str = "<string>") -> Snapshot:
 
 
 def profile_path(path: str | Path) -> Snapshot:
-    """Profile a single .sol file path."""
+    """Profile a single .sol file path.
+
+    Raises
+    ------
+    OSError
+        If the file cannot be read.
+    ValueError
+        If the file is not valid UTF-8 text.
+    """
     p = Path(path)
-    return profile_source(p.read_text(encoding="utf-8"), source_name=str(p))
+    try:
+        src = p.read_text(encoding="utf-8")
+    except UnicodeDecodeError as exc:
+        raise ValueError(
+            f"{p}: file is not valid UTF-8 and cannot be parsed as Solidity"
+        ) from exc
+    return profile_source(src, source_name=str(p))
 
 
 def build_snapshot(paths: Iterable[str | Path]) -> Snapshot:
@@ -335,13 +352,68 @@ def snapshot_to_dict(snap: Snapshot) -> dict:
 
 
 def load_snapshot(path: str | Path) -> Snapshot:
-    """Load a snapshot previously written as JSON."""
-    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    """Load a snapshot previously written as JSON.
+
+    Raises
+    ------
+    ValueError
+        If the file is not valid JSON or the top-level structure is not a dict.
+    KeyError / TypeError
+        Propagated with a descriptive prefix when a record is missing required
+        fields or has fields of the wrong type.
+    """
+    raw = Path(path).read_text(encoding="utf-8")
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"baseline is not valid JSON: {exc}") from exc
+    if not isinstance(data, dict):
+        raise ValueError(
+            f"baseline JSON must be an object, got {type(data).__name__}"
+        )
     snap = Snapshot(source=data.get("source", "<unknown>"))
-    for f in data.get("functions", []):
-        snap.functions.append(FunctionProfile(**f))
-    for f in data.get("findings", []):
-        snap.findings.append(Finding(**f))
+    _FUNCTION_FIELDS = {
+        "name", "signature", "estimated_gas", "loops",
+        "unbounded_loops", "storage_writes", "storage_reads",
+        "external_calls", "line",
+    }
+    _FINDING_FIELDS = {"function", "severity", "code", "message", "line"}
+    for i, f in enumerate(data.get("functions", [])):
+        if not isinstance(f, dict):
+            raise ValueError(
+                f"baseline functions[{i}] must be an object, "
+                f"got {type(f).__name__}"
+            )
+        missing = _FUNCTION_FIELDS - f.keys()
+        if missing:
+            raise ValueError(
+                f"baseline functions[{i}] is missing required fields: "
+                + ", ".join(sorted(missing))
+            )
+        try:
+            snap.functions.append(FunctionProfile(**f))
+        except TypeError as exc:
+            raise ValueError(
+                f"baseline functions[{i}] has wrong field types: {exc}"
+            ) from exc
+    for i, f in enumerate(data.get("findings", [])):
+        if not isinstance(f, dict):
+            raise ValueError(
+                f"baseline findings[{i}] must be an object, "
+                f"got {type(f).__name__}"
+            )
+        missing = _FINDING_FIELDS - f.keys()
+        if missing:
+            raise ValueError(
+                f"baseline findings[{i}] is missing required fields: "
+                + ", ".join(sorted(missing))
+            )
+        try:
+            snap.findings.append(Finding(**f))
+        except TypeError as exc:
+            raise ValueError(
+                f"baseline findings[{i}] has wrong field types: {exc}"
+            ) from exc
     return snap
 
 
