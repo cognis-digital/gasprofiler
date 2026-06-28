@@ -1,0 +1,3 @@
+$ gasprofiler-emit --version
+
+gasprofiler 0.1.0

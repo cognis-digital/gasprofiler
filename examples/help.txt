@@ -1,0 +1,25 @@
+$ gasprofiler-emit --help
+
+usage: gasprofiler [-h] [--version] [--format {table,json}]
+                   {profile,check} ...
+
+Per-function Solidity gas profiler: flags unbounded loops and gas regressions vs a baseline (forge-snapshot style).
+
+positional arguments:
+  {profile,check}
+    profile             profile contracts and print/save a per-function gas
+                        snapshot
+    check               compare contracts against a baseline; exit 1 on
+                        regression
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  --format {table,json}
+                        output format (default: table)
+
+examples:
+  gasprofiler profile contracts/Token.sol
+  gasprofiler profile 'contracts/**/*.sol' --out .gas-baseline.json
+  gasprofiler check 'contracts/**/*.sol' --baseline .gas-baseline.json --tolerance 0.05
+  gasprofiler profile contracts/Token.sol --format json | jq .

@@ -21,6 +21,86 @@ gasprofiler scan .            # → prioritized findings in seconds
 ```
 
 
+
+<!-- cognis:example:start -->
+## 🔎 Example output
+
+Real, reproducible output from the tool — runs offline:
+
+```console
+$ gasprofiler-emit --version
+gasprofiler 0.1.0
+```
+
+```console
+$ gasprofiler-emit --help
+usage: gasprofiler [-h] [--version] [--format {table,json}]
+                   {profile,check} ...
+
+Per-function Solidity gas profiler: flags unbounded loops and gas regressions vs a baseline (forge-snapshot style).
+
+positional arguments:
+  {profile,check}
+    profile             profile contracts and print/save a per-function gas
+                        snapshot
+    check               compare contracts against a baseline; exit 1 on
+                        regression
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  --format {table,json}
+                        output format (default: table)
+
+examples:
+  gasprofiler profile contracts/Token.sol
+  gasprofiler profile 'contracts/**/*.sol' --out .gas-baseline.json
+  gasprofiler check 'contracts/**/*.sol' --baseline .gas-baseline.json --tolerance 0.05
+  gasprofiler profile contracts/Token.sol --format json | jq .
+```
+
+> Blocks above are real `gasprofiler` output — reproduce them from a clone.
+
+**Sample result format** _(illustrative values — run on your own data for real findings):_
+
+```
+{
+"timestamp": "2023-02-15T14:30:00Z",
+"findings": [
+  {
+    "id": "1234567890",
+    "title": "Suspicious Network Traffic",
+    "description": "Potential malicious activity detected on network interface eth0.",
+    "labels": ["network", "suspicious"],
+    "objects": [
+      {
+        "type": "ip",
+        "value": "192.168.1.100"
+      },
+      {
+        "type": "port",
+        "value": 443
+      }
+    ]
+  },
+  {
+    "id": "2345678901",
+    "title": "Unusual File Access",
+    "description": "Unexpected access to system file /etc/passwd.",
+    "labels": ["file", "unusual"],
+    "objects": [
+      {
+        "type": "path",
+        "value": "/etc/passwd"
+      }
+    ]
+  }
+]
+}
+```
+
+<!-- cognis:example:end -->
+
 ## Usage — step by step
 
 1. Install (Python 3.9+):
